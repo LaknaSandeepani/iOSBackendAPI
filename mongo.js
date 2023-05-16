@@ -49,7 +49,52 @@ mongoose.connect(mongoUrl, {
       res.status(500).json({ error: 'Failed to save BMI data' });
     }
   });
-
+  
+  // Define the schema for the exercises
+  const exerciseSchema = new mongoose.Schema({
+    name: String,
+    category: String,
+    description: String,
+    duration: Number,
+    caloriesBurned: Number,
+    difficulty: String,
+    equipment: String,
+    muscleGroups: [String],
+    videoUrl: String
+  });
+  
+  // Create the Exercise model
+  const Exercise = mongoose.model('Exercise', exerciseSchema);
+  
+  // Define the route for retrieving exercises based on specific fields
+  app.get('/api/exercises', async (req, res) => {
+    const { name, category, difficulty } = req.query;
+  
+    // Build the query object based on the provided fields
+    const query = {};
+  
+    if (name) {
+      query.name = name;
+    }
+  
+    if (category) {
+      query.category = category;
+    }
+  
+    if (difficulty) {
+      query.difficulty = difficulty;
+    }
+  
+    try {
+      // Find exercises based on the query
+      const exercises = await Exercise.find(query).exec();
+      res.json(exercises);
+    } catch (err) {
+      console.error('Failed to retrieve exercises:', err);
+      res.status(500).json({ error: 'Failed to retrieve exercises' });
+    }
+  });
+  
   // Start the server
   const port = 8088; // Replace with your desired port number
   app.listen(port, () => {
