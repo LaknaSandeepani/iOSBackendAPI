@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const app = express();
+app.use(express.json());
 
 // Connection URL and database name
 const mongoUrl = "mongodb+srv://lakna:lakna@bodyfitnessbuilder.s4l6lye.mongodb.net/";
@@ -12,28 +14,48 @@ mongoose.connect(mongoUrl, {
 }).then(() => {
   console.log("Connected to MongoDB Atlas");
 
-//    // Define a data schema and model
-//    const userSchema = new mongoose.Schema({
-//     name: String,
-//     age: Number,
-//     email: String
-//   });
-  
-//   const User = mongoose.model("User", userSchema);
-  
-//   // Create a new user document
-//   const user = new User({
-//     name: "John Doe",
-//     age: 25,
-//     email: "johndoe@example.com"
-//   });
-  
-//   // Save the user to the database
-//   user.save().then(() => {
-//     console.log("User created and saved to the database");
-//   }).catch((err) => {
-//     console.error("Failed to save user:", err);
-//   });
-// }).catch((err) => {
-//   console.error("Failed to connect to MongoDB Atlas:", err);
+
+  // Define the schema for BMI data
+  const bmiSchema = new mongoose.Schema(
+    {
+      age: Number,
+      gender: String,
+      height: Number,
+      weight: Number,
+      bmi: Number,
+      goal: String
+    },
+    { collection: 'bmiData' } // Specify the collection name
+  );
+
+  // Create the BMI model
+  const BmiData = mongoose.model('BmiData', bmiSchema);
+
+  // Define the route for saving BMI data
+  app.post('/api/save-bmi', async (req, res) => {
+    const { age,gender,height, weight, bmi,goal } = req.body;
+
+    try {
+      // Create a new instance of the BmiData model
+      const bmiData = new BmiData({ age,gender,height, weight, bmi,goal});
+
+      // Save the BMI data to the database
+      const savedData = await bmiData.save();
+
+      console.log('BMI data saved:', savedData._id);
+      res.json({ message: 'BMI data saved' });
+    } catch (err) {
+      console.error('Failed to save BMI data:', err);
+      res.status(500).json({ error: 'Failed to save BMI data' });
+    }
+  });
+
+  // Start the server
+  const port = 8088; // Replace with your desired port number
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+
+}).catch((err) => {
+  console.error("Failed to connect to MongoDB Atlas:", err);
 });
