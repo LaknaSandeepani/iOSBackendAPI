@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const app = express();
 app.use(express.json());
-
+const JWT_SECRET = "argsbdthbsw236w7r8g@1e*hfvh";
 // Connection URL and database name
 const mongoUrl = "mongodb+srv://lakna:lakna@bodyfitnessbuilder.s4l6lye.mongodb.net/";
 
@@ -94,8 +95,76 @@ mongoose.connect(mongoUrl, {
       res.status(500).json({ error: 'Failed to retrieve exercises' });
     }
   });
+ 
+// Define the route for fetching exercise details by ID
+app.get('/api/exercises/:id', async (req, res) => {
+    const exerciseId = req.params.id;
+    
+    try {
+      // Find the exercise by ID
+      const exercise = await Exercise.findById(exerciseId).exec();
   
-  // Start the server
+      if (exercise) {
+        res.json(exercise);
+      } else {
+        res.status(404).json({ message: 'Exercise not found' });
+      }
+    } catch (err) {
+      console.error('Failed to retrieve exercise:', err);
+      res.status(500).json({ error: 'Failed to retrieve exercise' });
+    }
+  });
+  
+  const UserDetailsSchema = new mongoose.Schema({
+    name: String,
+    email: String, 
+    password: String,
+}, {
+    collection: "UserInfo",
+});
+
+const User = mongoose.model("UserInfo", UserDetailsSchema);
+
+// Register API
+app.post("/register", async (req, res) => {
+    const { name, email, password } = req.body;
+    
+    try {
+        const oldUser = await User.findOne({ email });
+        if (oldUser) {
+            return res.send({ status: "User Exists" });
+        }
+        
+        const newUser = new User({ name, email, password });
+        await newUser.save();
+        
+        res.send({ status: "ok" });
+    } catch (error) {
+        console.error(error);
+        res.send({ status: "error" });
+    }
+});
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.send({ status: "User not found" });
+        }
+        
+        if (user.password !== password) {
+            return res.send({ status: "Invalid password" });
+        }
+        
+        res.send({ status: "Logged in successfully" });
+    } catch (error) {
+        console.error(error);
+        res.send({ status: "error" });
+    }
+});
+
+ // Start the server
   const port = 8088; // Replace with your desired port number
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
