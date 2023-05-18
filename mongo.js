@@ -164,6 +164,48 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// Define the WorkoutSchedule schema
+const workoutScheduleSchema = new mongoose.Schema({
+  days: [String],
+  times: [String],
+  exercises: [String],
+  repeatSchedule: [String],
+});
+
+const WorkoutSchedule = mongoose.model('WorkoutSchedule', workoutScheduleSchema);
+
+// Create a new workout schedule
+app.post('/api/workoutschedule', (req, res) => {
+  const { days, times, exercises, repeatSchedule } = req.body;
+
+  const workoutSchedule = new WorkoutSchedule({
+    days,
+    times,
+    exercises,
+    repeatSchedule,
+  });
+
+  workoutSchedule.save()
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((error) => {
+      console.error('Error saving workout schedule:', error);
+      res.sendStatus(500);
+    });
+});
+
+app.get('/viewschedule', (req, res) => {
+    WorkoutSchedule.find()
+      .then((schedules) => {
+        res.json(schedules);
+      })
+      .catch((error) => {
+        console.error('Error fetching workout schedules:', error);
+        res.sendStatus(500);
+      });
+  });
+  
  // Start the server
   const port = 8088; // Replace with your desired port number
   app.listen(port, () => {
