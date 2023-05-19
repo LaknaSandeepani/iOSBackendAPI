@@ -63,6 +63,7 @@ mongoose.connect(mongoUrl, {
     muscleGroups: [String],
     videoUrl: String,
     repcount: Number,
+    image: String
    
   });
   
@@ -71,7 +72,7 @@ mongoose.connect(mongoUrl, {
   
   // Define the route for retrieving exercises based on specific fields
   app.get('/api/exercises', async (req, res) => {
-    const { name, category, difficulty } = req.query;
+    const { name, category, image } = req.query;
   
     // Build the query object based on the provided fields
     const query = {};
@@ -84,8 +85,8 @@ mongoose.connect(mongoUrl, {
       query.category = category;
     }
   
-    if (difficulty) {
-      query.difficulty = difficulty;
+    if (image) {
+      query.image = image;
     }
   
     try {
