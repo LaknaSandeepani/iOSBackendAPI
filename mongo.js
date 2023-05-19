@@ -61,7 +61,9 @@ mongoose.connect(mongoUrl, {
     difficulty: String,
     equipment: String,
     muscleGroups: [String],
-    videoUrl: String
+    videoUrl: String,
+    repcount: Number,
+   
   });
   
   // Create the Exercise model
