@@ -209,6 +209,23 @@ app.get('/viewschedule', (req, res) => {
       });
   });
   
+app.delete("/deleteschedule", async (req, res) => {
+    const { scheduleid } = req.body;
+    try {
+      await WorkoutSchedule.deleteOne({ _id: scheduleid });
+      res.status(200).send({
+        status: "ok",
+        data: "Deleted",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({
+        status: "error",
+        message: "Failed to delete WorkoutSchedule",
+      });
+    }
+  });
+
  // Start the server
   const port = 8088; // Replace with your desired port number
   app.listen(port, () => {
