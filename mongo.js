@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const bodyParser = require('body-parser');
 const app = express();
 app.use(express.json());
 const JWT_SECRET = "argsbdthbsw236w7r8g@1e*hfvh";
@@ -169,11 +170,13 @@ app.post("/login", async (req, res) => {
 
 // Define the WorkoutSchedule schema
 const workoutScheduleSchema = new mongoose.Schema({
-  days: [String],
-  times: [String],
-  exercises: [String],
-  repeatSchedule: [String],
-});
+    _id: mongoose.Schema.Types.ObjectId,
+    days: [String],
+    times: [String],
+    exercises: [String],
+    repeatSchedule: [String],
+  });
+  
 
 const WorkoutSchedule = mongoose.model('WorkoutSchedule', workoutScheduleSchema);
 
